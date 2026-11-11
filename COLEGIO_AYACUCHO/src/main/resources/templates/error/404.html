@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Página no encontrada')}"></head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+
+            <div class="display-1 text-warning mb-2">
+                <i class="bi bi-search"></i>
+            </div>
+
+            <h1 class="h2 mb-2">Página no encontrada (404)</h1>
+            <p class="text-muted mb-2">
+                <span th:text="${mensaje != null ? mensaje : 'El recurso o la página que busca no existe.'}">
+                    El recurso o la página que busca no existe.
+                </span>
+            </p>
+            <p class="text-muted small" th:if="${ruta != null}">
+                Ruta solicitada: <span class="font-monospace" th:text="${ruta}"></span>
+            </p>
+
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+                <a class="btn btn-primary" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2 me-1"></i>Ir al panel
+                </a>
+                <a class="btn btn-outline-secondary" th:href="@{/activos}">
+                    <i class="bi bi-pc-display me-1"></i>Ver activos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

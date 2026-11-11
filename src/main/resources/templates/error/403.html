@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Acceso denegado')}"></head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 text-center">
+
+            <div class="display-1 text-danger mb-2">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+
+            <h1 class="h2 mb-2">Acceso denegado (403)</h1>
+            <p class="text-muted mb-4">
+                Su rol no tiene permisos para acceder a esta sección.
+                Esta función está reservada al administrador del sistema.
+            </p>
+
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a class="btn btn-primary" th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2 me-1"></i>Ir al panel
+                </a>
+                <a class="btn btn-outline-secondary" th:href="@{/activos}">
+                    <i class="bi bi-pc-display me-1"></i>Ver activos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

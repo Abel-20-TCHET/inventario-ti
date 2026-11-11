@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+
+<!-- Mensajes flash de éxito / error -->
+<div th:fragment="flash">
+    <div th:if="${exito}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-1"></i>
+        <span th:text="${exito}">Operación realizada.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        <span th:text="${error}">Ocurrió un error.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+</div>
+
+<!-- Errores globales de un formulario -->
+<div th:fragment="erroresGlobales" th:if="${#fields.hasAnyErrors()}"
+     class="alert alert-danger" role="alert">
+    <p class="fw-semibold mb-1">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>Revise los siguientes puntos:
+    </p>
+    <ul class="mb-0">
+        <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+        <li th:if="${#fields.hasErrors('fechasCoherentes')}"
+            th:each="err : ${#fields.errors('fechasCoherentes')}" th:text="${err}"></li>
+    </ul>
+</div>
+
+</body>
+</html>

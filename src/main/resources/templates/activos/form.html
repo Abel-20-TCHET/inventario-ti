@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head th:replace="~{fragments/layout :: head(${esEdicion} ? 'Editar activo' : 'Nuevo activo')}"></head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container py-4">
+
+    <div class="mb-4">
+        <h1 class="h3 mb-1">
+            <i class="bi bi-pc-display text-primary me-1"></i>
+            <span th:text="${esEdicion} ? 'Editar activo' : 'Nuevo activo'">Nuevo activo</span>
+        </h1>
+        <p class="text-muted mb-0">Los campos marcados con <span class="text-danger">*</span> son obligatorios.</p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-3 p-md-4">
+
+            <form th:action="${esEdicion} ? @{/activos/{id}(id=${form.id})} : @{/activos}"
+                  method="post" th:object="${form}" novalidate>
+
+                <input type="hidden" th:field="*{id}">
+
+                <div th:replace="~{fragments/alertas :: erroresGlobales}"></div>
+
+                <div class="row g-3">
+
+                    <div class="col-12 col-md-4">
+                        <label for="codigo" class="form-label fw-semibold">
+                            Código <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="codigo" class="form-control font-monospace"
+                               th:field="*{codigo}"
+                               th:classappend="${#fields.hasErrors('codigo')} ? 'is-invalid' : ''"
+                               placeholder="CI-001" maxlength="10">
+                        <div class="invalid-feedback" th:errors="*{codigo}"></div>
+                        <div class="form-text">Formato institucional: CI-001.</div>
+                    </div>
+
+                    <div class="col-12 col-md-8">
+                        <label for="nombre" class="form-label fw-semibold">
+                            Nombre <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="nombre" class="form-control"
+                               th:field="*{nombre}"
+                               th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                               placeholder="Ej.: Switch de acceso SW-A1" maxlength="150">
+                        <div class="invalid-feedback" th:errors="*{nombre}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="tipoId" class="form-label fw-semibold">
+                            Tipo de activo <span class="text-danger">*</span>
+                        </label>
+                        <select id="tipoId" class="form-select"
+                                th:field="*{tipoId}"
+                                th:classappend="${#fields.hasErrors('tipoId')} ? 'is-invalid' : ''">
+                            <option value="">-- Seleccione un tipo --</option>
+                            <option th:each="t : ${tipos}"
+                                    th:value="${t.id}"
+                                    th:text="${t.nombre}">Servidor</option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{tipoId}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="ubicacionId" class="form-label fw-semibold">
+                            Ubicación <span class="text-danger">*</span>
+                        </label>
+                        <select id="ubicacionId" class="form-select"
+                                th:field="*{ubicacionId}"
+                                th:classappend="${#fields.hasErrors('ubicacionId')} ? 'is-invalid' : ''">
+                            <option value="">-- Seleccione una ubicación --</option>
+                            <option th:each="u : ${ubicaciones}"
+                                    th:value="${u.id}"
+                                    th:text="${u.nombre}">Sala de servidores</option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{ubicacionId}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="marca" class="form-label fw-semibold">Marca</label>
+                        <input type="text" id="marca" class="form-control"
+                               th:field="*{marca}"
+                               th:classappend="${#fields.hasErrors('marca')} ? 'is-invalid' : ''"
+                               placeholder="Ej.: Cisco" maxlength="80">
+                        <div class="invalid-feedback" th:errors="*{marca}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="modelo" class="form-label fw-semibold">Modelo</label>
+                        <input type="text" id="modelo" class="form-control"
+                               th:field="*{modelo}"
+                               th:classappend="${#fields.hasErrors('modelo')} ? 'is-invalid' : ''"
+                               placeholder="Ej.: Catalyst 9200-24P" maxlength="80">
+                        <div class="invalid-feedback" th:errors="*{modelo}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="numeroSerie" class="form-label fw-semibold">N° de serie</label>
+                        <input type="text" id="numeroSerie" class="form-control"
+                               th:field="*{numeroSerie}"
+                               th:classappend="${#fields.hasErrors('numeroSerie')} ? 'is-invalid' : ''"
+                               placeholder="Serie del fabricante" maxlength="100">
+                        <div class="invalid-feedback" th:errors="*{numeroSerie}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="responsable" class="form-label fw-semibold">Responsable</label>
+                        <input type="text" id="responsable" class="form-control"
+                               th:field="*{responsable}"
+                               th:classappend="${#fields.hasErrors('responsable')} ? 'is-invalid' : ''"
+                               placeholder="Área o persona responsable" maxlength="120">
+                        <div class="invalid-feedback" th:errors="*{responsable}"></div>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <label for="estado" class="form-label fw-semibold">
+                            Estado <span class="text-danger">*</span>
+                        </label>
+                        <select id="estado" class="form-select"
+                                th:field="*{estado}"
+                                th:classappend="${#fields.hasErrors('estado')} ? 'is-invalid' : ''">
+                            <option th:each="e : ${estados}"
+                                    th:value="${e.name()}"
+                                    th:text="${e.etiqueta}">Operativo</option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{estado}"></div>
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <label for="criticidad" class="form-label fw-semibold">
+                            Criticidad <span class="text-danger">*</span>
+                        </label>
+                        <select id="criticidad" class="form-select"
+                                th:field="*{criticidad}"
+                                th:classappend="${#fields.hasErrors('criticidad')} ? 'is-invalid' : ''">
+                            <option th:each="c : ${criticidades}"
+                                    th:value="${c.name()}"
+                                    th:text="${c.etiqueta}">Media</option>
+                        </select>
+                        <div class="invalid-feedback" th:errors="*{criticidad}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="fechaCompra" class="form-label fw-semibold">Fecha de compra</label>
+                        <input type="date" id="fechaCompra" class="form-control"
+                               th:field="*{fechaCompra}"
+                               th:classappend="${#fields.hasErrors('fechaCompra')} ? 'is-invalid' : ''">
+                        <div class="invalid-feedback" th:errors="*{fechaCompra}"></div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="fechaFinGarantia" class="form-label fw-semibold">Fin de garantía</label>
+                        <input type="date" id="fechaFinGarantia" class="form-control"
+                               th:field="*{fechaFinGarantia}"
+                               th:classappend="${#fields.hasErrors('fechaFinGarantia')} ? 'is-invalid' : ''">
+                        <div class="invalid-feedback" th:errors="*{fechaFinGarantia}"></div>
+                        <div class="form-text">No puede ser anterior a la fecha de compra.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+                        <textarea id="observaciones" class="form-control" rows="3"
+                                  th:field="*{observaciones}"
+                                  th:classappend="${#fields.hasErrors('observaciones')} ? 'is-invalid' : ''"
+                                  placeholder="Notas, incidencias, licencias, etc." maxlength="500"></textarea>
+                        <div class="invalid-feedback" th:errors="*{observaciones}"></div>
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex flex-wrap gap-2 justify-content-end">
+                    <a class="btn btn-outline-secondary"
+                       th:href="${esEdicion} ? @{/activos/{id}(id=${form.id})} : @{/activos}">
+                        <i class="bi bi-x-lg me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>
+                        <span th:text="${esEdicion} ? 'Guardar cambios' : 'Registrar activo'">Guardar</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</main>
+
+<div th:replace="~{fragments/layout :: pie}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

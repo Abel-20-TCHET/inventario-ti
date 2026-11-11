@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<body>
+
+<!-- Paginación reutilizable del listado de activos -->
+<nav th:fragment="paginacion(pagina, filtro)"
+     th:if="${pagina.totalPages > 1}"
+     aria-label="Paginación de activos">
+    <ul class="pagination justify-content-center flex-wrap mt-4 mb-0">
+
+        <li class="page-item" th:classappend="${pagina.first} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{/activos(page=${pagina.number - 1},
+                                    q=${filtro.q},
+                                    tipoId=${filtro.tipoId},
+                                    estado=${filtro.estado},
+                                    ubicacionId=${filtro.ubicacionId})}">
+                <i class="bi bi-chevron-left"></i>
+                <span class="d-none d-sm-inline">Anterior</span>
+            </a>
+        </li>
+
+        <li class="page-item"
+            th:each="i : ${#numbers.sequence(0, pagina.totalPages - 1)}"
+            th:classappend="${i == pagina.number} ? 'active' : ''">
+            <a class="page-link"
+               th:href="@{/activos(page=${i},
+                                    q=${filtro.q},
+                                    tipoId=${filtro.tipoId},
+                                    estado=${filtro.estado},
+                                    ubicacionId=${filtro.ubicacionId})}"
+               th:text="${i + 1}">1</a>
+        </li>
+
+        <li class="page-item" th:classappend="${pagina.last} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{/activos(page=${pagina.number + 1},
+                                    q=${filtro.q},
+                                    tipoId=${filtro.tipoId},
+                                    estado=${filtro.estado},
+                                    ubicacionId=${filtro.ubicacionId})}">
+                <span class="d-none d-sm-inline">Siguiente</span>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+</body>
+</html>

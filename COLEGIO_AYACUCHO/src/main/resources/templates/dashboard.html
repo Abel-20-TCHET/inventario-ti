@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head th:replace="~{fragments/layout :: head('Panel de control')}"></head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container-fluid px-3 px-lg-4 py-4">
+
+    <div th:replace="~{fragments/alertas :: flash}"></div>
+
+    <!-- ============================================================
+         Encabezado del panel
+         ============================================================ -->
+    <section class="dashboard-hero text-white rounded-4 shadow-sm mb-4">
+        <div class="p-4 p-lg-5">
+            <div class="row align-items-center g-4">
+
+                <div class="col-12 col-xl-8">
+                    <span class="badge hero-badge mb-3">
+                        <i class="bi bi-diagram-3 me-1"></i>CMDB · Gestión de Servicios de TI
+                    </span>
+                    <h1 class="h3 fw-bold mb-2">
+                        Bienvenido, <span sec:authentication="name">usuario</span>
+                    </h1>
+                    <p class="mb-2 text-white-50">
+                        Vista general del inventario tecnológico del Colegio Ayacucho.
+                        Controle el estado de los equipos, las garantías y los movimientos recientes.
+                    </p>
+                    <p class="mb-0 small text-white-50">
+                        <i class="bi bi-calendar3 me-1"></i>
+                        <span th:text="${fechaHoy}">Lunes 9 de noviembre de 2026</span>
+                        <span class="mx-2 opacity-50">|</span>
+                        <i class="bi bi-clock-history me-1"></i>
+                        Actualizado a las <span th:text="${horaActual}">16:30</span>
+                    </p>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="d-flex flex-wrap justify-content-xl-end gap-2">
+                        <a class="btn btn-light text-primary fw-semibold" th:href="@{/activos/nuevo}">
+                            <i class="bi bi-plus-lg me-1"></i>Nuevo activo
+                        </a>
+                        <a class="btn btn-outline-light" th:href="@{/activos}">
+                            <i class="bi bi-pc-display me-1"></i>Ver inventario
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         Indicadores principales
+         ============================================================ -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-6 g-3 mb-4">
+
+        <!-- Total -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-primary"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">Total de equipos</p>
+                            <p class="kpi-value mb-0" th:text="${resumen.total}">45</p>
+                        </div>
+                        <span class="kpi-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-pc-display"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos}">
+                        Ver inventario completo <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operativos -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-success"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">Operativos</p>
+                            <p class="kpi-value mb-0 text-success" th:text="${resumen.operativos}">40</p>
+                        </div>
+                        <span class="kpi-icon bg-success-subtle text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </span>
+                    </div>
+                    <div class="progress kpi-progress mt-3" role="progressbar"
+                         th:attr="aria-valuenow=${resumen.porcentajeOperativos}"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar bg-success"
+                             th:style="|width: ${resumen.porcentajeOperativos}%|"></div>
+                    </div>
+                    <p class="kpi-hint mb-0"
+                       th:text="|${resumen.porcentajeOperativos}% del inventario|">89% del inventario</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos(estado='OPERATIVO')}">
+                        Ver operativos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- En reparación -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-warning"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">En reparación</p>
+                            <p class="kpi-value mb-0 text-warning" th:text="${resumen.enReparacion}">2</p>
+                        </div>
+                        <span class="kpi-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-tools"></i>
+                        </span>
+                    </div>
+                    <div class="progress kpi-progress mt-3" role="progressbar"
+                         th:attr="aria-valuenow=${resumen.porcentajeEnReparacion}"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar bg-warning"
+                             th:style="|width: ${resumen.porcentajeEnReparacion}%|"></div>
+                    </div>
+                    <p class="kpi-hint mb-0"
+                       th:text="|${resumen.porcentajeEnReparacion}% del inventario|">4% del inventario</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos(estado='EN_REPARACION')}">
+                        Ver en reparación <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- De baja -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-secondary"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">De baja</p>
+                            <p class="kpi-value mb-0 text-secondary" th:text="${resumen.deBaja}">2</p>
+                        </div>
+                        <span class="kpi-icon bg-secondary-subtle text-secondary">
+                            <i class="bi bi-archive"></i>
+                        </span>
+                    </div>
+                    <div class="progress kpi-progress mt-3" role="progressbar"
+                         th:attr="aria-valuenow=${resumen.porcentajeDeBaja}"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar bg-secondary"
+                             th:style="|width: ${resumen.porcentajeDeBaja}%|"></div>
+                    </div>
+                    <p class="kpi-hint mb-0"
+                       th:text="|${resumen.porcentajeDeBaja}% del inventario|">4% del inventario</p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos(estado='DE_BAJA')}">
+                        Ver dados de baja <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Garantías por vencer -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-warning"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">Garantías por vencer</p>
+                            <p class="kpi-value mb-0 text-warning" th:text="${resumen.garantiasPorVencer}">6</p>
+                        </div>
+                        <span class="kpi-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-shield-exclamation"></i>
+                        </span>
+                    </div>
+                    <p class="kpi-hint mb-0 mt-3">
+                        <i class="bi bi-clock me-1"></i>Vencen en los próximos 60 días
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos}">
+                        Revisar equipos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Garantías vencidas -->
+        <div class="col">
+            <div class="card kpi-card h-100 border-0 shadow-sm">
+                <div class="kpi-accent bg-danger"></div>
+                <div class="card-body pb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="kpi-label mb-1">Garantías vencidas</p>
+                            <p class="kpi-value mb-0 text-danger" th:text="${resumen.garantiasVencidas}">3</p>
+                        </div>
+                        <span class="kpi-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-shield-x"></i>
+                        </span>
+                    </div>
+                    <p class="kpi-hint mb-0 mt-3">
+                        <i class="bi bi-exclamation-triangle me-1"></i>Equipos sin cobertura del fabricante
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <a class="kpi-link" th:href="@{/activos}">
+                        Revisar equipos <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         Gráficos: equipos por tipo y estado del inventario
+         ============================================================ -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-12 col-xl-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="h6 fw-bold mb-1">
+                            <i class="bi bi-bar-chart-line text-primary me-1"></i>Equipos por tipo
+                        </h2>
+                        <p class="small text-muted mb-0">Distribución del inventario según la clasificación del activo.</p>
+                    </div>
+                    <span class="badge text-bg-light border">
+                        <span th:text="${resumen.total}">45</span> equipos
+                    </span>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="chart-box chart-box-lg" th:if="${!#lists.isEmpty(resumen.porTipo)}">
+                        <canvas id="graficoPorTipo"></canvas>
+                    </div>
+                    <div class="text-center text-muted py-5" th:if="${#lists.isEmpty(resumen.porTipo)}">
+                        <i class="bi bi-bar-chart fs-1 d-block mb-2 opacity-50"></i>
+                        Todavía no hay activos registrados para graficar.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h2 class="h6 fw-bold mb-1">
+                        <i class="bi bi-pie-chart text-primary me-1"></i>Estado del inventario
+                    </h2>
+                    <p class="small text-muted mb-0">Situación operativa de los equipos registrados.</p>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="chart-wrap mx-auto" th:if="${resumen.total > 0}">
+                        <canvas id="graficoEstados"></canvas>
+                        <div class="chart-center">
+                            <span class="chart-center-value" th:text="${resumen.total}">45</span>
+                            <span class="chart-center-label">activos</span>
+                        </div>
+                    </div>
+                    <div class="text-center text-muted py-4" th:if="${resumen.total == 0}">
+                        <i class="bi bi-pie-chart fs-1 d-block mb-2 opacity-50"></i>
+                        Sin datos para graficar.
+                    </div>
+
+                    <ul class="list-unstyled mt-4 mb-0">
+                        <li class="legend-row">
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="legend-dot bg-success"></span>Operativos
+                            </span>
+                            <span>
+                                <strong th:text="${resumen.operativos}">40</strong>
+                                <small class="text-muted" th:text="|(${resumen.porcentajeOperativos}%)|">(89%)</small>
+                            </span>
+                        </li>
+                        <li class="legend-row">
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="legend-dot bg-warning"></span>En reparación
+                            </span>
+                            <span>
+                                <strong th:text="${resumen.enReparacion}">2</strong>
+                                <small class="text-muted" th:text="|(${resumen.porcentajeEnReparacion}%)|">(4%)</small>
+                            </span>
+                        </li>
+                        <li class="legend-row">
+                            <span class="d-flex align-items-center gap-2">
+                                <span class="legend-dot bg-secondary"></span>De baja
+                            </span>
+                            <span>
+                                <strong th:text="${resumen.deBaja}">3</strong>
+                                <small class="text-muted" th:text="|(${resumen.porcentajeDeBaja}%)|">(7%)</small>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================
+         Garantías y actividad reciente
+         ============================================================ -->
+    <div class="row g-3">
+
+        <div class="col-12 col-xl-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>
+                            <h2 class="h6 fw-bold mb-1">
+                                <i class="bi bi-shield-check text-primary me-1"></i>Salud de las garantías
+                            </h2>
+                            <p class="small text-muted mb-0">Cobertura del fabricante de todo el inventario.</p>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                            <i class="bi bi-bell me-1"></i>Alerta a 60 días
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-4">
+
+                    <!-- Barra apilada de cobertura -->
+                    <div class="progress warranty-bar mb-3" role="progressbar"
+                         th:if="${resumen.total > 0}">
+                        <div class="progress-bar bg-success"
+                             th:style="|width: ${resumen.porcentajeGarantiasVigentes}%|"
+                             th:title="|Vigentes: ${resumen.garantiasVigentes}|"></div>
+                        <div class="progress-bar bg-warning"
+                             th:style="|width: ${resumen.porcentajeGarantiasPorVencer}%|"
+                             th:title="|Por vencer: ${resumen.garantiasPorVencer}|"></div>
+                        <div class="progress-bar bg-danger"
+                             th:style="|width: ${resumen.porcentajeGarantiasVencidas}%|"
+                             th:title="|Vencidas: ${resumen.garantiasVencidas}|"></div>
+                        <div class="progress-bar bg-secondary"
+                             th:style="|width: ${resumen.porcentajeGarantiasSinRegistro}%|"
+                             th:title="|Sin registro: ${resumen.garantiasSinRegistro}|"></div>
+                    </div>
+
+                    <div class="row row-cols-2 row-cols-md-4 g-2 mb-4">
+                        <div class="col">
+                            <div class="warranty-stat">
+                                <span class="legend-dot bg-success"></span>
+                                <span class="warranty-stat-label">Vigentes</span>
+                                <span class="warranty-stat-value" th:text="${resumen.garantiasVigentes}">30</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="warranty-stat">
+                                <span class="legend-dot bg-warning"></span>
+                                <span class="warranty-stat-label">Por vencer</span>
+                                <span class="warranty-stat-value" th:text="${resumen.garantiasPorVencer}">6</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="warranty-stat">
+                                <span class="legend-dot bg-danger"></span>
+                                <span class="warranty-stat-label">Vencidas</span>
+                                <span class="warranty-stat-value" th:text="${resumen.garantiasVencidas}">3</span>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="warranty-stat">
+                                <span class="legend-dot bg-secondary"></span>
+                                <span class="warranty-stat-label">Sin registro</span>
+                                <span class="warranty-stat-value" th:text="${resumen.garantiasSinRegistro}">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas: por vencer / vencidas -->
+                    <ul class="nav nav-pills nav-fill dashboard-tabs mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-porvencer" data-bs-toggle="pill"
+                                    data-bs-target="#pane-porvencer" type="button" role="tab">
+                                <i class="bi bi-clock-history me-1"></i>Por vencer
+                                <span class="badge rounded-pill text-bg-warning ms-1"
+                                      th:text="${resumen.garantiasPorVencer}">6</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-vencidas" data-bs-toggle="pill"
+                                    data-bs-target="#pane-vencidas" type="button" role="tab">
+                                <i class="bi bi-shield-x me-1"></i>Vencidas
+                                <span class="badge rounded-pill text-bg-danger ms-1"
+                                      th:text="${resumen.garantiasVencidas}">3</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="pane-porvencer" role="tabpanel">
+                            <div class="list-group list-group-flush">
+                                <a class="list-group-item list-group-item-action px-0 alerta-item"
+                                   th:each="a : ${resumen.alertasPorVencer}"
+                                   th:href="@{/activos/{id}(id=${a.id})}">
+                                    <span class="badge text-bg-light border font-monospace"
+                                          th:text="${a.codigo}">CI-002</span>
+                                    <span class="alerta-detalle">
+                                        <span class="alerta-nombre" th:text="${a.nombre}">Switch core capa 3</span>
+                                        <span class="alerta-meta"
+                                              th:text="|${a.tipo.nombre} · ${a.ubicacion.nombre}|">
+                                            Switch · Sala de servidores
+                                        </span>
+                                    </span>
+                                    <span class="badge text-bg-warning"
+                                          th:text="${a.garantiaTexto}">Vence en 45 días</span>
+                                </a>
+                                <div class="text-center text-muted py-4"
+                                     th:if="${#lists.isEmpty(resumen.alertasPorVencer)}">
+                                    <i class="bi bi-check2-circle fs-2 d-block mb-2 text-success"></i>
+                                    Ningún equipo vence su garantía en los próximos 60 días.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pane-vencidas" role="tabpanel">
+                            <div class="list-group list-group-flush">
+                                <a class="list-group-item list-group-item-action px-0 alerta-item"
+                                   th:each="a : ${resumen.alertasVencidas}"
+                                   th:href="@{/activos/{id}(id=${a.id})}">
+                                    <span class="badge text-bg-light border font-monospace"
+                                          th:text="${a.codigo}">CI-001</span>
+                                    <span class="alerta-detalle">
+                                        <span class="alerta-nombre" th:text="${a.nombre}">Firewall perimetral NGFW</span>
+                                        <span class="alerta-meta"
+                                              th:text="|${a.tipo.nombre} · ${a.ubicacion.nombre}|">
+                                            Firewall · Gabinete principal
+                                        </span>
+                                    </span>
+                                    <span class="badge text-bg-danger"
+                                          th:text="${a.garantiaTexto}">Vencida hace 240 días</span>
+                                </a>
+                                <div class="text-center text-muted py-4"
+                                     th:if="${#lists.isEmpty(resumen.alertasVencidas)}">
+                                    <i class="bi bi-check2-circle fs-2 d-block mb-2 text-success"></i>
+                                    Todos los equipos mantienen su garantía vigente.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="h6 fw-bold mb-1">
+                            <i class="bi bi-activity text-primary me-1"></i>Actividad reciente
+                        </h2>
+                        <p class="small text-muted mb-0">Últimos movimientos registrados en la CMDB.</p>
+                    </div>
+                    <i class="bi bi-clock-history fs-4 text-muted opacity-50"></i>
+                </div>
+                <div class="card-body px-4 pb-4">
+
+                    <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(resumen.movimientos)}">
+                        <div class="list-group-item px-0 py-2 border-0" th:each="h : ${resumen.movimientos}">
+                            <div class="d-flex gap-3">
+                                <span class="timeline-icon"
+                                      th:classappend="|bg-${h.accion.claseCss}-subtle text-${h.accion.claseCss}|">
+                                    <i th:classappend="|bi bi-${h.accion.icono}|"></i>
+                                </span>
+                                <div class="flex-grow-1 min-w-0">
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+                                        <span class="fw-semibold small" th:text="${h.accion.etiqueta}">Edición</span>
+                                        <span class="text-muted small text-nowrap"
+                                              th:text="${#temporals.format(h.fecha, 'dd/MM HH:mm')}">09/11 16:20</span>
+                                    </div>
+                                    <p class="small text-muted mb-0 text-truncate"
+                                       th:text="${h.detalle}"
+                                       th:title="${h.detalle}">
+                                        Activo registrado: CI-001 - Firewall perimetral
+                                    </p>
+                                    <p class="small text-muted mb-0">
+                                        <i class="bi bi-person me-1"></i>
+                                        <span th:text="${h.nombreUsuario}">Administrador</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-muted py-5" th:if="${#lists.isEmpty(resumen.movimientos)}">
+                        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                        Todavía no hay movimientos registrados.<br>
+                        <span class="small">Las altas, ediciones y bajas aparecerán aquí.</span>
+                    </div>
+
+                    <div class="text-center mt-3" th:if="${!#lists.isEmpty(resumen.movimientos)}">
+                        <a class="btn btn-sm btn-outline-secondary" th:href="@{/activos}">
+                            <i class="bi bi-pc-display me-1"></i>Ir al inventario
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p class="text-center text-muted small mt-4 mb-0">
+        <i class="bi bi-info-circle me-1"></i>
+        Tablero calculado en tiempo real sobre la base de datos del inventario.
+    </p>
+
+</main>
+
+<div th:replace="~{fragments/layout :: pie}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+
+<!-- Chart.js solo se carga en el panel de control -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    (function () {
+        'use strict';
+        if (!window.Chart) {
+            return;
+        }
+
+        var porTipo = /*[[${resumen.porTipo}]]*/ [];
+        var total = /*[[${resumen.total}]]*/ 0;
+        var operativos = /*[[${resumen.operativos}]]*/ 0;
+        var enReparacion = /*[[${resumen.enReparacion}]]*/ 0;
+        var deBaja = /*[[${resumen.deBaja}]]*/ 0;
+
+        Chart.defaults.font.family = "'Segoe UI', system-ui, -apple-system, sans-serif";
+        Chart.defaults.color = '#6c757d';
+
+        // ---------------- Equipos por tipo (barras horizontales) ----------
+        var canvasTipo = document.getElementById('graficoPorTipo');
+        if (canvasTipo && porTipo.length > 0) {
+            new Chart(canvasTipo, {
+                type: 'bar',
+                data: {
+                    labels: porTipo.map(function (t) { return t.tipo; }),
+                    datasets: [{
+                        label: 'Equipos',
+                        data: porTipo.map(function (t) { return t.total; }),
+                        backgroundColor: '#0d6efd',
+                        hoverBackgroundColor: '#0b5ed7',
+                        borderRadius: 6,
+                        borderSkipped: false,
+                        barThickness: 18
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 700 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0b2d5c',
+                            padding: 10,
+                            callbacks: {
+                                label: function (ctx) {
+                                    return ' ' + ctx.parsed.x + ' equipo(s)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { precision: 0, stepSize: 1 },
+                            grid: { color: 'rgba(0, 0, 0, .05)' },
+                            border: { display: false }
+                        },
+                        y: {
+                            grid: { display: false },
+                            border: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---------------- Estado del inventario (dona) --------------------
+        var canvasEstados = document.getElementById('graficoEstados');
+        if (canvasEstados && total > 0) {
+            new Chart(canvasEstados, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Operativos', 'En reparación', 'De baja'],
+                    datasets: [{
+                        data: [operativos, enReparacion, deBaja],
+                        backgroundColor: ['#198754', '#ffc107', '#6c757d'],
+                        hoverBackgroundColor: ['#157347', '#e0a800', '#5c636a'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '74%',
+                    animation: { animateRotate: true, duration: 800 },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0b2d5c',
+                            padding: 10,
+                            callbacks: {
+                                label: function (ctx) {
+                                    var valor = ctx.parsed;
+                                    var pct = total > 0 ? Math.round(valor * 100 / total) : 0;
+                                    return ' ' + ctx.label + ': ' + valor + ' (' + pct + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    })();
+</script>
+
+</body>
+</html>

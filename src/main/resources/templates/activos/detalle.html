@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="es">
+<head th:replace="~{fragments/layout :: head(${activo.codigo} + ' - Detalle')}"></head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container py-4">
+
+    <div th:replace="~{fragments/alertas :: flash}"></div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+
+        <div>
+            <p class="text-muted mb-1">
+                <a th:href="@{/activos}" class="text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al inventario
+                </a>
+            </p>
+            <h1 class="h3 mb-1">
+                <span class="font-monospace text-primary" th:text="${activo.codigo}">CI-001</span>
+                <span th:text="|· ${activo.nombre}|"></span>
+            </h1>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+                <span class="badge" th:classappend="|text-bg-${activo.estado.claseCss}|"
+                      th:text="${activo.estado.etiqueta}">Operativo</span>
+                <span class="badge" th:classappend="|text-bg-${activo.criticidad.claseCss}|"
+                      th:text="|Criticidad ${activo.criticidad.etiqueta}|">Criticidad Alta</span>
+                <span class="badge" th:classappend="|text-bg-${activo.estadoGarantia.claseCss}|"
+                      th:text="|Garantía: ${activo.estadoGarantia.etiqueta}|">Garantía: Vigente</span>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-primary" th:href="@{/activos/{id}/editar(id=${activo.id})}">
+                <i class="bi bi-pencil me-1"></i>Editar
+            </a>
+            <form method="post" sec:authorize="hasRole('ADMIN')"
+                  th:action="@{/activos/{id}/eliminar(id=${activo.id})}"
+                  th:attr="data-confirm=|¿Eliminar el activo ${activo.codigo} - ${activo.nombre}? Esta acción no se puede deshacer.|">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i>Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alerta de garantía -->
+    <div th:if="${activo.estadoGarantia.name() == 'VENCIDA'}"
+         class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-shield-x fs-5"></i>
+        <div>
+            <strong>Garantía vencida.</strong>
+            <span th:text="|El equipo perdió la cobertura del fabricante (${activo.garantiaTexto}).|"></span>
+        </div>
+    </div>
+    <div th:if="${activo.estadoGarantia.name() == 'POR_VENCER'}"
+         class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-shield-exclamation fs-5"></i>
+        <div>
+            <strong>Garantía por vencer.</strong>
+            <span th:text="|${activo.garantiaTexto}. Coordine la renovación o el reemplazo.|"></span>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white pt-3">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tab-detalle" data-bs-toggle="tab"
+                            data-bs-target="#pane-detalle" type="button" role="tab">
+                        <i class="bi bi-card-list me-1"></i>Detalle
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tab-historial" data-bs-toggle="tab"
+                            data-bs-target="#pane-historial" type="button" role="tab">
+                        <i class="bi bi-clock-history me-1"></i>Historial
+                        <span class="badge text-bg-secondary ms-1"
+                              th:text="${#lists.size(historial)}">0</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body">
+            <div class="tab-content">
+
+                <!-- Pestaña Detalle -->
+                <div class="tab-pane fade show active" id="pane-detalle" role="tabpanel">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 text-muted">Código</dt>
+                        <dd class="col-sm-9 font-monospace fw-semibold" th:text="${activo.codigo}">CI-001</dd>
+
+                        <dt class="col-sm-3 text-muted">Nombre</dt>
+                        <dd class="col-sm-9" th:text="${activo.nombre}">Firewall perimetral</dd>
+
+                        <dt class="col-sm-3 text-muted">Tipo</dt>
+                        <dd class="col-sm-9" th:text="${activo.tipo.nombre}">Firewall</dd>
+
+                        <dt class="col-sm-3 text-muted">Marca / Modelo</dt>
+                        <dd class="col-sm-9">
+                            <span th:text="${activo.marca != null ? activo.marca : '—'}"></span>
+                            <span th:if="${activo.modelo != null}" th:text="| / ${activo.modelo}|"></span>
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">N° de serie</dt>
+                        <dd class="col-sm-9" th:text="${activo.numeroSerie != null ? activo.numeroSerie : '—'}">—</dd>
+
+                        <dt class="col-sm-3 text-muted">Ubicación</dt>
+                        <dd class="col-sm-9" th:text="${activo.ubicacion.nombre}">Gabinete principal</dd>
+
+                        <dt class="col-sm-3 text-muted">Responsable</dt>
+                        <dd class="col-sm-9" th:text="${activo.responsable != null ? activo.responsable : '—'}">—</dd>
+
+                        <dt class="col-sm-3 text-muted">Estado</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge" th:classappend="|text-bg-${activo.estado.claseCss}|"
+                                  th:text="${activo.estado.etiqueta}">Operativo</span>
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">Criticidad</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge" th:classappend="|text-bg-${activo.criticidad.claseCss}|"
+                                  th:text="${activo.criticidad.etiqueta}">Alta</span>
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">Fecha de compra</dt>
+                        <dd class="col-sm-9"
+                            th:text="${activo.fechaCompra != null ? #temporals.format(activo.fechaCompra, 'dd/MM/yyyy') : '—'}">
+                            —
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">Fin de garantía</dt>
+                        <dd class="col-sm-9">
+                            <span th:text="${activo.fechaFinGarantia != null ? #temporals.format(activo.fechaFinGarantia, 'dd/MM/yyyy') : '—'}"></span>
+                            <span class="ms-2 small"
+                                  th:classappend="|text-${activo.estadoGarantia.claseCss}|"
+                                  th:text="${activo.garantiaTexto}"></span>
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">Observaciones</dt>
+                        <dd class="col-sm-9" th:text="${activo.observaciones != null ? activo.observaciones : '—'}">—</dd>
+
+                        <dt class="col-sm-3 text-muted">Registrado</dt>
+                        <dd class="col-sm-9"
+                            th:text="${activo.fechaRegistro != null ? #temporals.format(activo.fechaRegistro, 'dd/MM/yyyy HH:mm') : '—'}">
+                            —
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">Última actualización</dt>
+                        <dd class="col-sm-9"
+                            th:text="${activo.fechaActualizacion != null ? #temporals.format(activo.fechaActualizacion, 'dd/MM/yyyy HH:mm') : 'Sin cambios'}">
+                            Sin cambios
+                        </dd>
+                    </dl>
+                </div>
+
+                <!-- Pestaña Historial -->
+                <div class="tab-pane fade" id="pane-historial" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Acción</th>
+                                <th scope="col">Usuario</th>
+                                <th scope="col">Detalle</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:if="${#lists.isEmpty(historial)}">
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="bi bi-clock-history fs-3 d-block mb-2"></i>
+                                    Todavía no hay movimientos registrados para este activo.
+                                </td>
+                            </tr>
+                            <tr th:each="h : ${historial}">
+                                <td class="text-nowrap"
+                                    th:text="${#temporals.format(h.fecha, 'dd/MM/yyyy HH:mm')}">
+                                    09/11/2026 10:00
+                                </td>
+                                <td>
+                                    <span class="badge text-bg-light border text-dark">
+                                        <i th:classappend="|bi bi-${h.accion.icono} me-1|"></i>
+                                        <span th:text="${h.accion.etiqueta}">Creación</span>
+                                    </span>
+                                </td>
+                                <td th:text="${h.nombreUsuario}">Administrador</td>
+                                <td class="small" th:text="${h.detalle}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<div th:replace="~{fragments/layout :: pie}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+/* =========================================================
+   Inventario de Activos de TI - Colegio Ayacucho
+   Ajustes propios sobre Bootstrap 5
+   ========================================================= */
+
+:root {
+    --altura-navbar: 56px;
+}
+
+body {
+    background-color: #f4f6f9;
+}
+
+.card {
+    border-radius: .75rem;
+}
+
+.card-kpi {
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.card-kpi:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
+}
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: .2px;
+}
+
+.table thead th {
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: #6c757d;
+    white-space: nowrap;
+}
+
+.display-6 {
+    font-size: 2.2rem;
+    line-height: 1.1;
+}
+
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Formularios: un poco más de aire en móviles */
+.form-label {
+    margin-bottom: .25rem;
+}
+
+@media (max-width: 575.98px) {
+    h1.h3 {
+        font-size: 1.35rem;
+    }
+    .display-6 {
+        font-size: 1.8rem;
+    }
+    .container-fluid {
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+}
+
+/* =========================================================
+   Panel de control
+   ========================================================= */
+
+/* Encabezado con degradado institucional */
+.dashboard-hero {
+    background:
+        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .20) 0, rgba(255, 255, 255, 0) 42%),
+        radial-gradient(circle at 8% 92%, rgba(13, 110, 253, .38) 0, rgba(13, 110, 253, 0) 55%),
+        linear-gradient(135deg, #0a2a52 0%, #10427e 55%, #1557a8 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px);
+    background-size: 34px 34px;
+    opacity: .35;
+    pointer-events: none;
+}
+
+.dashboard-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-hero .btn {
+    white-space: nowrap;
+}
+
+.hero-badge {
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: .02em;
+    padding: .45rem .7rem;
+    border-radius: .5rem;
+}
+
+/* Tarjetas de indicadores */
+.kpi-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .75rem 1.5rem rgba(15, 42, 82, .10) !important;
+}
+
+.kpi-accent {
+    height: 4px;
+}
+
+.kpi-label {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #6c757d;
+    font-weight: 700;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -.03em;
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+}
+
+.kpi-progress {
+    height: 6px;
+    border-radius: 999px;
+    background-color: #eef1f5;
+}
+
+.kpi-progress .progress-bar {
+    border-radius: 999px;
+}
+
+.kpi-hint {
+    font-size: .74rem;
+    color: #6c757d;
+    margin-top: .4rem;
+}
+
+.kpi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    font-size: .78rem;
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.kpi-link:hover {
+    text-decoration: underline;
+}
+
+/* Gráficos */
+.chart-box {
+    position: relative;
+    height: 300px;
+}
+
+.chart-box-lg {
+    height: 330px;
+}
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+    height: 250px;
+}
+
+.chart-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.chart-center-value {
+    display: block;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #0b2d5c;
+}
+
+.chart-center-label {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #6c757d;
+}
+
+.legend-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .45rem 0;
+    border-bottom: 1px dashed #e9ecef;
+    font-size: .88rem;
+}
+
+.legend-row:last-child {
+    border-bottom: 0;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+/* Salud de garantías */
+.warranty-bar {
+    height: 12px;
+    border-radius: 999px;
+    background-color: #eef1f5;
+    overflow: hidden;
+}
+
+.warranty-bar .progress-bar {
+    border-right: 2px solid #fff;
+}
+
+.warranty-bar .progress-bar:last-child {
+    border-right: 0;
+}
+
+.warranty-stat {
+    background: #f8f9fb;
+    border: 1px solid #eef1f5;
+    border-radius: .65rem;
+    padding: .55rem .65rem;
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.warranty-stat-label {
+    font-size: .72rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.warranty-stat-value {
+    margin-left: auto;
+    font-weight: 700;
+    color: #212529;
+}
+
+/* Pestañas y listas de alertas */
+.dashboard-tabs .nav-link {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #6c757d;
+    border-radius: .6rem;
+}
+
+.dashboard-tabs .nav-link.active {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.dashboard-tabs .nav-link .badge {
+    font-size: .68rem;
+}
+
+.alerta-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.alerta-detalle {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.alerta-nombre {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #212529;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.alerta-meta {
+    font-size: .75rem;
+    color: #6c757d;
+}
+
+.alerta-item .badge:last-child {
+    white-space: nowrap;
+}
+
+/* Actividad reciente */
+.timeline-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: .95rem;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+@media (max-width: 575.98px) {
+    .chart-box,
+    .chart-box-lg {
+        height: 260px;
+    }
+    .kpi-value {
+        font-size: 1.7rem;
+    }
+    .dashboard-hero .btn {
+        flex: 1 1 auto;
+    }
+    .alerta-item {
+        flex-wrap: wrap;
+    }
+    .alerta-item .badge:last-child {
+        margin-left: 2.6rem;
+    }
+}

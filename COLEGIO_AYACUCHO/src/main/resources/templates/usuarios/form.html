@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="es">
+<head th:replace="~{fragments/layout :: head(${esEdicion} ? 'Editar usuario' : 'Nuevo usuario')}"></head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+
+            <h1 class="h3 mb-3">
+                <i class="bi bi-person-gear text-primary me-1"></i>
+                <span th:text="${esEdicion} ? 'Editar usuario' : 'Nuevo usuario'">Nuevo usuario</span>
+            </h1>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+
+                    <form th:action="${esEdicion} ? @{/usuarios/{id}(id=${form.id})} : @{/usuarios}"
+                          method="post" th:object="${form}" novalidate autocomplete="off">
+
+                        <input type="hidden" th:field="*{id}">
+
+                        <div th:replace="~{fragments/alertas :: erroresGlobales}"></div>
+
+                        <div class="row g-3">
+
+                            <div class="col-12 col-md-6">
+                                <label for="username" class="form-label fw-semibold">
+                                    Nombre de usuario <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="username" class="form-control font-monospace"
+                                       th:field="*{username}"
+                                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                       placeholder="Ej.: tecnico2" maxlength="50">
+                                <div class="invalid-feedback" th:errors="*{username}"></div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="nombreCompleto" class="form-label fw-semibold">
+                                    Nombre completo <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" id="nombreCompleto" class="form-control"
+                                       th:field="*{nombreCompleto}"
+                                       th:classappend="${#fields.hasErrors('nombreCompleto')} ? 'is-invalid' : ''"
+                                       placeholder="Ej.: Juan Pérez Gómez" maxlength="120">
+                                <div class="invalid-feedback" th:errors="*{nombreCompleto}"></div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="rol" class="form-label fw-semibold">
+                                    Rol <span class="text-danger">*</span>
+                                </label>
+                                <select id="rol" class="form-select"
+                                        th:field="*{rol}"
+                                        th:classappend="${#fields.hasErrors('rol')} ? 'is-invalid' : ''">
+                                    <option value="">-- Seleccione un rol --</option>
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.name()}"
+                                            th:text="${r.etiqueta}">Técnico</option>
+                                </select>
+                                <div class="invalid-feedback" th:errors="*{rol}"></div>
+                                <div class="form-text">
+                                    ADMIN gestiona todo; TECNICO solo consulta y edita activos.
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="password" class="form-label fw-semibold">
+                                    Contraseña
+                                    <span th:if="${!esEdicion}" class="text-danger">*</span>
+                                </label>
+                                <input type="password" id="password" class="form-control"
+                                       th:field="*{password}"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       placeholder="Mínimo 8 caracteres" maxlength="60"
+                                       autocomplete="new-password">
+                                <div class="invalid-feedback" th:errors="*{password}"></div>
+                                <div class="form-text" th:if="${esEdicion}">
+                                    Deje vacío para conservar la contraseña actual.
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                           id="activo" th:field="*{activo}">
+                                    <label class="form-check-label" for="activo">
+                                        Usuario activo (puede iniciar sesión)
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a class="btn btn-outline-secondary" th:href="@{/usuarios}">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-1"></i>Guardar
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/layout :: pie}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>
